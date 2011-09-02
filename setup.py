@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import os
 
-from distutils.core import setup
-from distutils.command.install import INSTALL_SCHEMES
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 VERSION = '0.1'
 
