@@ -9,7 +9,7 @@ VERSION = '0.1'
 
 setup(name='django-jimmypage',
     version=VERSION,
-    description="Generational page cacheing for Django",
+    description="Generational page caching for Django",
     author='Charlie DeTar',
     author_email='cfd@media.mit.edu',
     url='http://github.com/yourcelf/jimmypage',
