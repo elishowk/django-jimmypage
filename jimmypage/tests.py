@@ -53,6 +53,12 @@ class CacheabilityTest(TestCase):
         response['Pragma'] = "no-cache"
         self.assertFalse(response_is_cacheable(request, response))
 
+    def test_dont_cache_if_vary_is_cookie(self):
+        request = self.factory.get("/")
+        response = HttpResponse()
+        response['Vary'] = "Cookie"
+        self.assertFalse(response_is_cacheable(request, response))
+
     def test_key_uniqueness(self):
         req = HttpRequest()
         req.path = "/some/path"
