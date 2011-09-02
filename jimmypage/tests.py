@@ -37,13 +37,16 @@ class CacheabilityTest(TestCase):
         response = HttpResponse("foo")
         self.assertTrue(response_is_cacheable(request, response))
 
+    def test_dont_cache_responses_that_include_messages(self):
+        request = self.factory.get("/")
+        response = self.client.get("/test_messages/")
+        self.assertFalse(response_is_cacheable(request, response))
+
     def test_cacheable(self):
         req = HttpRequest()
         req.path = "/some/path"
         req.method = "GET"
         self.assertTrue(request_is_cacheable(req))
-
-        # TODO: ensure that messages works
 
         redirect = HttpResponseRedirect("someurl")
         self.assertFalse(response_is_cacheable(req, redirect))
