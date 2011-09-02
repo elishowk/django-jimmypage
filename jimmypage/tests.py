@@ -29,13 +29,13 @@ class CacheabilityTest(unittest.TestCase):
         # TODO: ensure that messages works
 
         res = HttpResponse("fun times")
-        self.assertTrue(response_is_cacheable(res))
+        self.assertTrue(response_is_cacheable(req, res))
 
         redirect = HttpResponseRedirect("someurl")
-        self.assertFalse(response_is_cacheable(redirect))
+        self.assertFalse(response_is_cacheable(req, redirect))
 
         res['Pragma'] = "no-cache"
-        self.assertFalse(response_is_cacheable(res))
+        self.assertFalse(response_is_cacheable(req, res))
 
     def test_key_uniqueness(self):
         req = HttpRequest()
