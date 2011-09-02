@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test.client import RequestFactory
 
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib import messages
@@ -8,6 +9,16 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
 
 class CacheabilityTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_only_cache_get_requests(self):
+        request = self.factory.get("/")
+        self.assertTrue(request_is_cacheable(request))
+
+        request = self.factory.post("/")
+        self.assertFalse(request_is_cacheable(request))
+
     def test_cacheable(self):
         req = HttpRequest()
         req.path = "/some/path"
@@ -15,12 +26,6 @@ class CacheabilityTest(TestCase):
         self.assertTrue(request_is_cacheable(req))
 
         req.user = AnonymousUser()
-        self.assertTrue(request_is_cacheable(req))
-
-        req.method = "POST"
-        self.assertFalse(request_is_cacheable(req))
-
-        req.method = "GET"
         self.assertTrue(request_is_cacheable(req))
 
         # TODO: ensure that messages works
