@@ -1,4 +1,4 @@
-import unittest
+from django.test import TestCase
 
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib import messages
@@ -10,7 +10,7 @@ from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cac
 class Model(models.Model):
     char = models.CharField(max_length=255, blank=True, null=True)
 
-class CacheabilityTest(unittest.TestCase):
+class CacheabilityTest(TestCase):
     def test_cacheable(self):
         req = HttpRequest()
         req.path = "/some/path"
