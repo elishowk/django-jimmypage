@@ -7,9 +7,6 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
 
-class Model(models.Model):
-    char = models.CharField(max_length=255, blank=True, null=True)
-
 class CacheabilityTest(TestCase):
     def test_cacheable(self):
         req = HttpRequest()
