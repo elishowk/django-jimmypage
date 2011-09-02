@@ -47,14 +47,11 @@ class CacheabilityTest(TestCase):
         response = HttpResponseRedirect("/other/")
         self.assertFalse(response_is_cacheable(request, response))
 
-    def test_cacheable(self):
-        req = HttpRequest()
-        req.path = "/some/path"
-        req.method = "GET"
-        self.assertTrue(request_is_cacheable(req))
-
-        # res['Pragma'] = "no-cache"
-        # self.assertFalse(response_is_cacheable(req, res))
+    def test_dont_cache_if_pragma_says_so(self):
+        request = self.factory.get("/")
+        response = HttpResponse()
+        response['Pragma'] = "no-cache"
+        self.assertFalse(response_is_cacheable(request, response))
 
     def test_key_uniqueness(self):
         req = HttpRequest()
