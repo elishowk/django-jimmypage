@@ -12,6 +12,8 @@ from django.conf import settings
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
 
 class JimmyPageTests(TestCase):
+    urls = 'jimmypage.test_urls'
+
     def setUp(self):
         self.factory = RequestFactory()
 
@@ -37,6 +39,13 @@ class JimmyPageTests(TestCase):
         self.assertEqual(content, "text/plain", content)
         self.assertEqual(content_type, "text/plain", content_type)
 
+        response = self.client.get("/content-types/text/plain/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, "text/plain")
+
+        headers = dict(response.items())
+        self.assertEqual(headers["Content-Type"], "text/plain")
+
         # --------------------------------------------------------------
 
         request = self.factory.get("/content-types/text/html/")
@@ -46,6 +55,13 @@ class JimmyPageTests(TestCase):
 
         self.assertEqual(content, "<b>text/html</b>", content)
         self.assertEqual(content_type, "text/html", content_type)
+
+        response = self.client.get("/content-types/text/html/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, "<b>text/html</b>")
+
+        headers = dict(response.items())
+        self.assertEqual(headers["Content-Type"], "text/html")
 
 class CacheabilityTest(TestCase):
     urls = 'jimmypage.test_urls'
