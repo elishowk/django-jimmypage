@@ -6,8 +6,46 @@ from django.contrib import messages
 from django.db import models
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login
+from django.core.cache import cache
+from django.conf import settings
 
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
+
+class JimmyPageTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def tearDown(self):
+        cache.clear()
+
+    def get_from_cache(self, request):
+        return cache.get(get_cache_key(request))
+
+    def test_serve_correct_content_type_from_cache(self):
+        """Ensure each view gets served with its appropriate Content-Type.
+
+        Otherwise, every response gets served as DEFAULT_CONTENT_TYPE which
+        would mangle responses that aren't the default Content-Type.
+        """
+        from jimmypage.test_views import test_text_plain, test_text_html
+
+        request = self.factory.get("/content-types/text/plain/")
+        response = test_text_plain(request)
+
+        (content, content_type) = self.get_from_cache(request)
+
+        self.assertEqual(content, "text/plain", content)
+        self.assertEqual(content_type, "text/plain", content_type)
+
+        # --------------------------------------------------------------
+
+        request = self.factory.get("/content-types/text/html/")
+        response = test_text_html(request)
+
+        (content, content_type) = self.get_from_cache(request)
+
+        self.assertEqual(content, "<b>text/html</b>", content)
+        self.assertEqual(content_type, "text/html", content_type)
 
 class CacheabilityTest(TestCase):
     urls = 'jimmypage.test_urls'
