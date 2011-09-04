@@ -29,7 +29,7 @@ class JimmyPageTests(TestCase):
         Otherwise, every response gets served as DEFAULT_CONTENT_TYPE which
         would mangle responses that aren't the default Content-Type.
         """
-        from jimmypage.test_views import test_text_plain, test_text_html
+        from jimmypage.tests.views import test_text_plain, test_text_html
 
         request = self.factory.get("/content-types/text/plain/")
         response = test_text_plain(request)
