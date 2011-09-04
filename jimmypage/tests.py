@@ -63,6 +63,13 @@ class JimmyPageTests(TestCase):
         headers = dict(response.items())
         self.assertEqual(headers["Content-Type"], "text/html")
 
+    def test_etag(self):
+        """Ensure the response's ETag is the cache key."""
+        request = self.factory.get("/content-types/text/plain/")
+        response = self.client.get("/content-types/text/plain/")
+        headers = dict(response.items())
+        self.assertEqual(headers["ETag"], get_cache_key(request))
+
 class CacheabilityTest(TestCase):
     urls = 'jimmypage.test_urls'
 
