@@ -21,4 +21,4 @@ CACHES = {
     },
 }
 
-ROOT_URLCONF = 'jimmypage.test_urls'
+ROOT_URLCONF = 'jimmypage.tests.urls'

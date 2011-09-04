@@ -12,7 +12,7 @@ from django.conf import settings
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
 
 class JimmyPageTests(TestCase):
-    urls = 'jimmypage.test_urls'
+    urls = 'jimmypage.tests.urls'
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -71,7 +71,7 @@ class JimmyPageTests(TestCase):
         self.assertEqual(headers["ETag"], get_cache_key(request))
 
 class CacheabilityTest(TestCase):
-    urls = 'jimmypage.test_urls'
+    urls = 'jimmypage.tests.urls'
 
     def setUp(self):
         self.factory = RequestFactory()

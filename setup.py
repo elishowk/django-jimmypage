@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'jimmypage.test_settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jimmypage.tests.settings'
 
 try:
     from setuptools import setup
@@ -18,7 +18,7 @@ setup(
     author_email='cfd@media.mit.edu',
     url='http://github.com/yourcelf/jimmypage',
     packages=['jimmypage'],
-    test_suite='jimmypage.runtests.runtests',
+    test_suite='jimmypage.tests.runtests.runtests',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
