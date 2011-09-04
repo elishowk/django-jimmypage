@@ -20,8 +20,8 @@ __all__ = ('cache_page', 'clear_cache')
 CACHE_PREFIX = getattr(settings, 'JIMMY_PAGE_CACHE_PREFIX', 'jp')
 CACHE_SECONDS = getattr(settings, 'JIMMY_PAGE_CACHE_SECONDS', 0)
 DISABLED = getattr(settings, 'JIMMY_PAGE_DISABLED', False)
-EXPIRATION_WHITELIST = set(getattr(settings, 
-    'JIMMY_PAGE_EXPIRATION_WHITELIST', 
+EXPIRATION_WHITELIST = set(getattr(settings,
+    'JIMMY_PAGE_EXPIRATION_WHITELIST',
     [
         "django_session",
         "django_admin_log",
@@ -51,14 +51,14 @@ class cache_page(object):
     Decorator to invoke cacheing for a view.  Can be used either this way::
 
         # uses default cache timeout
-        @cache_page 
+        @cache_page
         def my_view(request, ...):
             ...
 
     or this way::
 
         # uses 60 seconds as cache timeout
-        @cache_page(60) 
+        @cache_page(60)
         def my_view(request, ...):
             ...
 
@@ -109,13 +109,13 @@ class cache_page(object):
             else:
                 debug("Not storable.")
             response["ETag"] = key
-            return response 
+            return response
         debug("Not retrievable.")
         debug("generating!")
         return self.f(request, *args, **kwargs)
 
 def get_cache_key(request):
-    user_id = "" 
+    user_id = ""
     try:
         if request.user.is_authenticated():
             user_id = str(request.user.id)
