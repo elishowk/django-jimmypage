@@ -21,4 +21,6 @@ CACHES = {
     },
 }
 
+JIMMY_CACHE_CACHE_SECONDS = 60
+
 ROOT_URLCONF = 'jimmypage.tests.urls'
