@@ -1,12 +1,5 @@
 import urllib
 import logging
-try:
-    import hashlib
-    md5 = hashlib.md5
-except ImportError:
-    # for Python << 2.5
-    import md5 as md5_lib
-    md5 = md5_lib.new()
 
 from django.conf import settings
 from django.contrib import messages
@@ -15,6 +8,7 @@ from django.db.models.signals import post_save, pre_delete
 from django.http import HttpResponse
 from django.utils import translation
 from django.utils.encoding import iri_to_uri
+from django.utils.hashcompat import md5_constructor
 
 logger = logging.getLogger("jimmypage")
 
@@ -142,7 +136,7 @@ def get_cache_key(request):
         bits["language"],
         bits["user_id"]])
 
-    digest = md5(key).hexdigest()
+    digest = md5_constructor(key).hexdigest()
     logger.debug("generating cache key: %r (%s)" % (bits, digest))
     return digest
 
