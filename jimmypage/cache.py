@@ -123,6 +123,7 @@ def get_cache_key(request):
         "cache_prefix": str(CACHE_PREFIX),
         "generation": str(cache.get(GLOBAL_GENERATION)),
         "path": iri_to_uri(request.path),
+        "domain": unicode(request.site.domain) if hasattr(request, 'site') else "*",
         "get_params": urllib.urlencode(request.GET),
         "language": translation.get_language(),
         "user_id": str(user_id),
@@ -132,6 +133,7 @@ def get_cache_key(request):
         bits["cache_prefix"],
         bits["generation"],
         bits["path"],
+        bits["domain"],
         bits["get_params"],
         bits["language"],
         bits["user_id"]])
