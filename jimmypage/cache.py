@@ -84,31 +84,30 @@ class cache_page(object):
         return self.decorated
 
     def decorated(self, request, *args, **kwargs):
-        debug("starting")
         if request_is_cacheable(request):
             key = get_cache_key(request)
-            debug("Retrievable.")
+            debug("This request is cacheable.")
             cached = cache.get(key)
             if cached is not None:
-                debug("serving from cache")
+                debug("Found at cache: Yes. Serving cached")
                 (content, content_type) = cached
                 res = HttpResponse(content=content, content_type=content_type)
                 res["ETag"] = key
                 return res
+            else:
+                debug("Found at cache: NO")
 
-            debug("generating!")
             response = self.f(request, *args, **kwargs)
             if response_is_cacheable(request, response):
-                debug("storing!")
+                debug("Storing response in cache: Yes")
                 content = response.content
                 content_type = dict(response.items()).get("Content-Type")
                 cache.set(key, (content, content_type), self.time)
             else:
-                debug("Not storable.")
+                debug("Storing response in cache: NO. Isn't cacheable")
             response["ETag"] = key
             return response
-        debug("Not retrievable.")
-        debug("generating!")
+        debug("This request is NOT cacheable.")
         return self.f(request, *args, **kwargs)
 
 def get_cache_key(request):
@@ -139,7 +138,7 @@ def get_cache_key(request):
         bits["user_id"]])
 
     digest = md5_constructor(key).hexdigest()
-    logger.debug("generating cache key: %r (%s)" % (bits, digest))
+    logger.debug("Jimmy-Page cache key: %r (%s)" % (bits, digest))
     return digest
 
 def request_is_cacheable(request):
