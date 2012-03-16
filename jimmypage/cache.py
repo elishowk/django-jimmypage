@@ -139,7 +139,7 @@ def get_cache_key(request):
 
     digest = md5_constructor(key).hexdigest()
     debug("Jimmy-Page cache key: %r (%s)" % (bits, digest))
-    return "%s.%s" % (bits["cache_prefix"], digest)
+    return digest
 
 def request_is_cacheable(request):
     return (not DISABLED) and \
