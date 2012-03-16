@@ -1,4 +1,5 @@
 import urllib
+import logging
 try:
     import hashlib
     md5 = hashlib.md5
@@ -14,6 +15,8 @@ from django.db.models.signals import post_save, pre_delete
 from django.http import HttpResponse
 from django.utils import translation
 from django.utils.encoding import iri_to_uri
+
+logger = logging.getLogger("jimmypage")
 
 __all__ = ('cache_page', 'clear_cache')
 
@@ -147,7 +150,7 @@ def response_is_cacheable(request, response):
 
 if DEBUG_CACHE:
     def debug(*args):
-        print "JIMMYPAGE: " + " ".join([str(a) for a in args])
+        logger.debug(" ".join([str(a) for a in args]))
 else:
     def debug(*args):
         pass
