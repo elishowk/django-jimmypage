@@ -4,22 +4,24 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib import messages
-from django.db import models
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.contrib.auth import login
 from django.core.cache import cache
-from django.conf import settings
 
 from jimmypage.cache import request_is_cacheable, response_is_cacheable, get_cache_key
 from jimmypage import cache_page
+from jimmypage.tests.views import test_text_plain, test_text_html
 
-class JimmyPageTests(TestCase):
+from testapp.models import Article
+
+
+class JimmyPageTestsBase(TestCase):
     urls = 'jimmypage.tests.urls'
 
     def setUp(self):
         self.factory = RequestFactory()
 
+
+class JimmyPageCacheTests(JimmyPageTestsBase):
     def get_from_cache(self, request):
         return cache.get(get_cache_key(request))
 
@@ -29,13 +31,10 @@ class JimmyPageTests(TestCase):
         Otherwise, every response gets served as DEFAULT_CONTENT_TYPE which
         would mangle responses that aren't the default Content-Type.
         """
-        from jimmypage.tests.views import test_text_plain, test_text_html
-
         request = self.factory.get("/content-types/text/plain/")
         response = test_text_plain(request)
 
         (content, content_type) = self.get_from_cache(request)
-
         self.assertEqual(content, "text/plain", content)
         self.assertEqual(content_type, "text/plain", content_type)
 
@@ -52,7 +51,6 @@ class JimmyPageTests(TestCase):
         response = test_text_html(request)
 
         (content, content_type) = self.get_from_cache(request)
-
         self.assertEqual(content, "<b>text/html</b>", content)
         self.assertEqual(content_type, "text/html", content_type)
 
@@ -94,12 +92,8 @@ class JimmyPageTests(TestCase):
         response = self.client.get(url)
         self.assertTrue(self.get_from_cache(request))
 
-class CacheabilityTest(TestCase):
-    urls = 'jimmypage.tests.urls'
 
-    def setUp(self):
-        self.factory = RequestFactory()
-
+class JimmyPageCacheabilityTests(JimmyPageTestsBase):
     def test_only_cache_get_requests(self):
         request = self.factory.get("/")
         self.assertTrue(request_is_cacheable(request))
@@ -121,11 +115,6 @@ class CacheabilityTest(TestCase):
         request = self.factory.get("/")
         response = HttpResponse("foo")
         self.assertTrue(response_is_cacheable(request, response))
-
-    def test_dont_cache_responses_that_include_messages(self):
-        request = self.factory.get("/")
-        response = self.client.get("/test_messages/")
-        self.assertFalse(response_is_cacheable(request, response))
 
     def test_dont_cache_redirects(self):
         request = self.factory.get("/")
@@ -162,3 +151,41 @@ class CacheabilityTest(TestCase):
 
         self.assertNotEqual(get_cache_key(req), get_cache_key(req2))
         self.assertNotEqual(get_cache_key(req), get_cache_key(req3))
+
+
+class JimmyPageBackendTests(JimmyPageTestsBase):
+    def test_backend_accepts_zero(self):
+        from jimmypage.backends import DefaultCache
+
+        backend = DefaultCache("127.0.0.1:11311", {"timeout": 0})
+        self.assertEqual(backend.default_timeout, 0)
+
+        backend = DefaultCache("127.0.0.1:11311", {"timeout": None})
+        self.assertEqual(backend.default_timeout, 300)
+
+        backend = DefaultCache("127.0.0.1:11311", {"timeout": "abc"})
+        self.assertEqual(backend.default_timeout, 300)
+
+        backend = DefaultCache("127.0.0.1:11311", {"timeout": 60})
+        self.assertEqual(backend.default_timeout, 60)
+
+
+class JimmyPageGenerationTests(JimmyPageTestsBase):
+    """
+    TODO
+    Tests of asynchronous cache regeneration
+    """
+    def test_worker_launched(self):
+        """
+        and check that the previous cache is served while reconstructing cache
+        """
+        url = "/"
+        response = self.client.get(url)
+        headers = dict(response.items())
+        key = headers["ETag"]
+        modified_model = Article(title="modified", body="modified")
+        modified_model.save()
+        response2 = self.client.get(url)
+        headers2 = dict(response2.items())
+        key2 = headers["ETag"]
+        self.assertEqual(key, key2)
